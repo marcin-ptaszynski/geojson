@@ -2,6 +2,18 @@ package geojson
 
 import "testing"
 
+func expectPolygonJSON(t *testing.T, data string, expectedErrMsg string) *Polygon {
+	var g Polygon
+	err := g.UnmarshalJSON([]byte(data))
+	if err != nil || expectedErrMsg != "" {
+		var actualErrMsg string
+		if actualErrMsg != expectedErrMsg {
+			t.Errorf("unmarshal error message mismatch: '%s' != '%s'", actualErrMsg, expectedErrMsg)
+		}
+	}
+	return &g
+}
+
 func TestPolygonParse(t *testing.T) {
 	json := `{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]]]}`
 	g := expectJSON(t, json, nil)
@@ -39,6 +51,14 @@ func TestPolygonParseValid(t *testing.T) {
 
 func TestPolygonVarious(t *testing.T) {
 	var g = expectJSON(t, `{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]]]}`, nil)
+	expect(t, string(g.AppendJSON(nil)) == `{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]]]}`)
+	expect(t, g.Rect() == R(0, 0, 10, 10))
+	expect(t, g.Center() == P(5, 5))
+	expect(t, !g.Empty())
+}
+
+func TestPolygonJSONUnmarshal(t *testing.T) {
+	var g = expectPolygonJSON(t, `{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]]]}`, "")
 	expect(t, string(g.AppendJSON(nil)) == `{"type":"Polygon","coordinates":[[[0,0],[10,0],[10,10],[0,10],[0,0]]]}`)
 	expect(t, g.Rect() == R(0, 0, 10, 10))
 	expect(t, g.Center() == P(5, 5))

@@ -61,6 +61,16 @@ func (g *Rect) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *Rect) UnmarshalJSON(in []byte) error {
+	var gPoly Polygon
+	if err := gPoly.UnmarshalJSON(in); err != nil {
+		return err
+	}
+	g.base = gPoly.base.Exterior.Rect()
+	return nil
+}
+
 // String ...
 func (g *Rect) String() string {
 	return string(g.AppendJSON(nil))

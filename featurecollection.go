@@ -50,6 +50,11 @@ func (g *FeatureCollection) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *FeatureCollection) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 func parseJSONFeatureCollection(
 	keys *parseKeys, opts *ParseOptions,
 ) (Object, error) {

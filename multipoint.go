@@ -51,6 +51,11 @@ func (g *MultiPoint) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *MultiPoint) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 func parseJSONMultiPoint(keys *parseKeys, opts *ParseOptions) (Object, error) {
 	var g MultiPoint
 	var err error

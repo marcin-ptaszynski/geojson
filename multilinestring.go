@@ -63,6 +63,11 @@ func (g *MultiLineString) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *MultiLineString) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 func parseJSONMultiLineString(
 	keys *parseKeys, opts *ParseOptions,
 ) (Object, error) {

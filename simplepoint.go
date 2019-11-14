@@ -65,6 +65,16 @@ func (g *SimplePoint) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnarshalJSON ...
+func (g *SimplePoint) UnmarshalJSON(in []byte) error {
+	var p Point
+	if err := parseJSONAs(string(in), &p, nil); err != nil {
+		return err
+	}
+	g.base = p.base
+	return nil
+}
+
 // String ...
 func (g *SimplePoint) String() string {
 	return string(g.AppendJSON(nil))

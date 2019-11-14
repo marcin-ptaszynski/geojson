@@ -2,6 +2,18 @@ package geojson
 
 import "testing"
 
+func expectMultiPolygonJSON(t *testing.T, data string, expectedErrMsg string) *MultiPolygon {
+	var g MultiPolygon
+	err := g.UnmarshalJSON([]byte(data))
+	if err != nil || expectedErrMsg != "" {
+		var actualErrMsg string
+		if actualErrMsg != expectedErrMsg {
+			t.Errorf("unmarshal error message mismatch: '%s' != '%s'", actualErrMsg, expectedErrMsg)
+		}
+	}
+	return &g
+}
+
 func TestMultiPolygon(t *testing.T) {
 	json := `{"type":"MultiPolygon","coordinates":[
 		[
@@ -59,4 +71,19 @@ func TestIssue369(t *testing.T) {
 	query := expectJSON(t, `{"type":"MultiPolygon","coordinates":[[[[-122.4408378,37.7341129],[-122.4408378,37.733],[-122.44,37.733],[-122.44,37.7341129],[-122.4408378,37.7341129]]],[[[-122.44091033935547,37.731981251280985],[-122.43994474411011,37.731981251280985],[-122.43994474411011,37.73254976045042],[-122.44091033935547,37.73254976045042],[-122.44091033935547,37.731981251280985]]]]}`, nil)
 	expect(t, !query.Intersects(poly14))
 	expect(t, !poly14.Intersects(query))
+}
+
+func TestMultiPolygonJSONUnmarshal(t *testing.T) {
+	p := expectMultiPolygonJSON(t, `{"type":"MultiPolygon","coordinates":[
+		[
+			[[10,10],[20,20],[30,10],[10,10]]
+		],[
+			[[100,100],[200,200],[300,100],[100,100]]
+		]
+	]}`, "")
+	expect(t, p.Intersects(PO(15, 15)))
+	expect(t, p.Contains(PO(15, 15)))
+	expect(t, p.Contains(PO(150, 150)))
+	expect(t, !p.Contains(PO(40, 40)))
+	expect(t, p.Within(RO(-100, -100, 1000, 1000)))
 }

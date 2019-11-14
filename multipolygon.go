@@ -62,6 +62,11 @@ func (g *MultiPolygon) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *MultiPolygon) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 func parseJSONMultiPolygon(
 	keys *parseKeys, opts *ParseOptions,
 ) (Object, error) {

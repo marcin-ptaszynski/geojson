@@ -50,6 +50,11 @@ func (g *GeometryCollection) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *GeometryCollection) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 func parseJSONGeometryCollection(
 	keys *parseKeys, opts *ParseOptions,
 ) (Object, error) {

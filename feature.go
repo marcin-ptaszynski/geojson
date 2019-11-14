@@ -98,6 +98,11 @@ func (g *Feature) MarshalJSON() ([]byte, error) {
 	return g.AppendJSON(nil), nil
 }
 
+// UnmarshalJSON ...
+func (g *Feature) UnmarshalJSON(in []byte) error {
+	return parseJSONAs(string(in), g, nil)
+}
+
 // Spatial ...
 func (g *Feature) Spatial() Spatial {
 	return g

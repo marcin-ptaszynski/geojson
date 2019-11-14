@@ -1,6 +1,7 @@
 package geojson
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 var (
 	fmtErrTypeIsUnknown         = "type '%s' is unknown"
+	fmtErrTypeMismatch          = "type '%T' is does not match expected type '%T'"
 	errDataInvalid              = errors.New("invalid data")
 	errTypeInvalid              = errors.New("invalid type")
 	errTypeMissing              = errors.New("missing type")
@@ -29,6 +31,8 @@ var (
 
 // Object is a GeoJSON type
 type Object interface {
+	json.Marshaler
+	json.Unmarshaler
 	Empty() bool
 	Valid() bool
 	Rect() geometry.Rect
@@ -43,7 +47,6 @@ type Object interface {
 	NumPoints() int
 	ForEach(iter func(geom Object) bool) bool
 	Spatial() Spatial
-	MarshalJSON() ([]byte, error)
 }
 
 var _ = []Object{
@@ -220,6 +223,78 @@ func parseJSON(data string, opts *ParseOptions) (Object, error) {
 	case "FeatureCollection":
 		return parseJSONFeatureCollection(&keys, opts)
 	}
+}
+
+func parseJSONAs(data string, v Object, opts *ParseOptions) error {
+	obj, err := Parse(data, opts)
+	if err != nil {
+		return err
+	}
+	switch tv := v.(type) {
+	case *Point:
+		if nv, ok := obj.(*Point); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *LineString:
+		if nv, ok := obj.(*LineString); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *Polygon:
+		if nv, ok := obj.(*Polygon); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *MultiPolygon:
+		if nv, ok := obj.(*MultiPolygon); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *Feature:
+		if nv, ok := obj.(*Feature); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *Circle:
+		if nv, ok := obj.(*Circle); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *MultiPoint:
+		if nv, ok := obj.(*MultiPoint); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *MultiLineString:
+		if nv, ok := obj.(*MultiLineString); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *GeometryCollection:
+		if nv, ok := obj.(*GeometryCollection); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	case *FeatureCollection:
+		if nv, ok := obj.(*FeatureCollection); !ok {
+			return fmt.Errorf(fmtErrTypeMismatch, tv, obj)
+		} else {
+			*tv = *nv
+		}
+	default:
+		return fmt.Errorf(fmtErrTypeIsUnknown, tv)
+	}
+	return nil
 }
 
 func parseBBoxAndExtras(ex **extra, keys *parseKeys, opts *ParseOptions) error {
